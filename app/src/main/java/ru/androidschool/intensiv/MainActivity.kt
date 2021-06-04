@@ -10,6 +10,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
+    companion object {
+        private val TAG = MainActivity::class.java.simpleName
+        private val API_KEY = BuildConfig.THE_MOVIE_DATABASE_API
+    }
+
     @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
