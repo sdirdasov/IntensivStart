@@ -1,12 +1,173 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="ru.androidschool.intensiv.ui.movie_details.MovieDetailsFragment">
 
-    <TextView
+    <include layout="@layout/movie_details_header"/>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:background="@color/blueDark"
+        android:overScrollMode="never"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-</FrameLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/material_margin_large"
+            android:orientation="horizontal">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/content_start"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="@dimen/material_margin_normal"/>
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/content_end"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="@dimen/material_margin_small"/>
+
+            <TextView
+                android:id="@+id/movie_title"
+                style="@style/AppTheme.Title.TextAppearance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="@id/content_start"
+                tools:text="Aquaman"/>
+
+            <ImageButton
+                android:id="@+id/movie_favor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_favorite_border"
+                android:background="@color/blueDark"
+                app:tint="@color/textColorGrey"
+                app:layout_constraintTop_toTopOf="@id/movie_title"
+                app:layout_constraintBottom_toBottomOf="@id/movie_title"
+                app:layout_constraintEnd_toEndOf="@id/content_end"
+                tools:ignore="ContentDescription"/>
+
+            <Button
+                android:id="@+id/watch_movie_button"
+                android:layout_width="@dimen/watch_button_width"
+                android:layout_height="@dimen/watch_button_height"
+                android:layout_marginTop="@dimen/material_margin_normal"
+                android:text="@string/watch"
+                android:textAllCaps="false"
+                android:textColor="@color/textColorLight"
+                android:background="@drawable/button_background"
+                app:layout_constraintTop_toBottomOf="@id/movie_title"
+                app:layout_constraintStart_toStartOf="@id/content_start"/>
+
+            <androidx.appcompat.widget.AppCompatRatingBar
+                android:id="@+id/movie_rating"
+                style="@style/Base.Widget.AppCompat.RatingBar.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:isIndicator="true"
+                android:numStars="5"
+                android:progressBackgroundTint="@color/colorControlNormal"
+                android:stepSize="0.5"
+                app:layout_constraintTop_toTopOf="@id/watch_movie_button"
+                app:layout_constraintBottom_toBottomOf="@id/watch_movie_button"
+                app:layout_constraintEnd_toEndOf="@id/content_end"
+                tools:rating="5"/>
+
+            <TextView
+                android:id="@+id/movie_description"
+                style="@style/AppTheme.Text.Gray.Normal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/material_margin_normal"
+                app:layout_constraintTop_toBottomOf="@+id/watch_movie_button"
+                app:layout_constraintStart_toStartOf="@id/content_start"
+                app:layout_constraintEnd_toEndOf="@id/content_end"
+                tools:text="@tools:sample/lorem/random"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/actors_recycler_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/material_margin_normal"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/movie_description"
+                app:layout_constraintStart_toStartOf="@id/content_start"
+                app:layout_constraintEnd_toEndOf="@id/content_end"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_actor"/>
+
+            <TextView
+                android:id="@+id/studio_label"
+                style="@style/AppTheme.Text.Light.Normal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/studio_label_text"
+                app:layout_constraintTop_toBottomOf="@+id/actors_recycler_view"
+                app:layout_constraintStart_toStartOf="@id/content_start"/>
+
+            <TextView
+                android:id="@+id/movie_studio"
+                style="@style/AppTheme.Text.Gray.Normal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/actors_recycler_view"
+                app:layout_constraintStart_toEndOf="@id/content2_start"
+                tools:text="Warner Bros."/>
+
+            <TextView
+                android:id="@+id/genre_label"
+                style="@style/AppTheme.Text.Light.Normal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/genre_label_text"
+                app:layout_constraintTop_toBottomOf="@+id/studio_label"
+                app:layout_constraintStart_toStartOf="@id/content_start"/>
+
+            <TextView
+                android:id="@+id/movie_genre"
+                style="@style/AppTheme.Text.Gray.Normal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/movie_studio"
+                app:layout_constraintStart_toEndOf="@id/content2_start"
+                tools:text="Action, Adventure, Fantasy"/>
+
+            <TextView
+                android:id="@+id/year_label"
+                style="@style/AppTheme.Text.Light.Normal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/year_label_text"
+                app:layout_constraintTop_toBottomOf="@+id/genre_label"
+                app:layout_constraintStart_toStartOf="@id/content_start"/>
+
+            <TextView
+                android:id="@+id/movie_year"
+                style="@style/AppTheme.Text.Gray.Normal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/movie_genre"
+                app:layout_constraintStart_toEndOf="@id/content2_start"
+                tools:text="2018"/>
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/content2_start"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="90dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

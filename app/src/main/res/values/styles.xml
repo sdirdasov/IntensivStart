@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/white </item>
     </style>
 
 
@@ -17,8 +18,23 @@
         <item name="android:textSize">48sp</item>
     </style>
 
+    <style name="AppTheme.Title.TextAppearance" parent="android:TextAppearance">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textColor">@color/textColorLight</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="ShapeAppearanceOverlay.App.CornerSize10Percent" parent="">
         <item name="cornerSize">10%</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.App.CornerSize50Percent" parent="">
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.App.BottomCornerSize10Percent" parent="">
+        <item name="cornerSizeBottomLeft">10%</item>
+        <item name="cornerSizeBottomRight">10%</item>
     </style>
 
     <style name="AppTheme.TextAppearance.Description" parent="android:TextAppearance">
@@ -26,6 +42,16 @@
         <item name="textAllCaps">true</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="AppTheme.Text.Gray.Normal" parent="android:TextAppearance">
+        <item name="android:textColor">@color/textColorGrey</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="AppTheme.Text.Light.Normal" parent="android:TextAppearance">
+        <item name="android:textColor">@color/textColorLight</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
 </resources>
