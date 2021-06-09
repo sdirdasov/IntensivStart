@@ -26,4 +26,9 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="placeholder">Пёс Киноман</string>
+
+    <string name="watch">Смотреть</string>
+    <string name="studio_label_text">Студия</string>
+    <string name="genre_label_text">Жанр</string>
+    <string name="year_label_text">Год</string>
 </resources>
