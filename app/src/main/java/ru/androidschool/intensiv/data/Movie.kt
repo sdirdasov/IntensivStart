@@ -1,14 +1,16 @@
 package ru.androidschool.intensiv.data
 
+import com.google.gson.annotations.SerializedName
+
 data class Movie(
-    var title: String? = "",
-    var voteAverage: Double = 0.0,
-    var description: String = "",
-    var studio: String = "",
-    var genre: String = "",
-    var year: String = "",
-    var actors: List<String> = emptyList()
+    @SerializedName("id")
+    val id: Int,
+    @SerializedName("title")
+    val title: String,
+    @SerializedName("vote_average")
+    val voteAverage: Double
 ) {
-    val rating: Float
-        get() = voteAverage.div(2).toFloat()
+    @SerializedName("poster_path")
+    val posterPath: String? = null
+        get() = "https://image.tmdb.org/t/p/w500$field"
 }

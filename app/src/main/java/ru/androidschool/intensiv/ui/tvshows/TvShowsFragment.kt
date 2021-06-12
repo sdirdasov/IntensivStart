@@ -8,8 +8,13 @@ import androidx.fragment.app.Fragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.tv_shows_fragment.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import ru.androidschool.intensiv.R
-import ru.androidschool.intensiv.data.MockRepository
+import ru.androidschool.intensiv.network.MovieApiClient
+import ru.androidschool.intensiv.network.responses.TvShowsResponse
+import timber.log.Timber
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -43,11 +48,27 @@ class TvShowsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val tvShowsList = MockRepository.getTvShows().map {
-                TvShowItem(it)
-            }.toList()
+        tv_shows_recycler_view.adapter = adapter
+        val getTvShows = MovieApiClient.apiClient.getTvShows()
+        getTvShows.enqueue(provideResponseCallback())
+    }
 
-        tv_shows_recycler_view.adapter = adapter.apply { addAll(tvShowsList) }
+    private fun provideResponseCallback() = object : Callback<TvShowsResponse> {
+        override fun onFailure(call: Call<TvShowsResponse>, t: Throwable) {
+            Timber.e(t)
+        }
+
+        override fun onResponse(
+            call: Call<TvShowsResponse>,
+            response: Response<TvShowsResponse>
+        ) {
+            response.body()?.results?.let { result ->
+                val tvShowsList = result.map {
+                    TvShowItem(it)
+                }
+                adapter.apply { addAll(tvShowsList) }
+            }
+        }
     }
 
     companion object {

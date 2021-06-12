@@ -1,9 +1,16 @@
 package ru.androidschool.intensiv.data
 
+import com.google.gson.annotations.SerializedName
+
 data class TvShow(
-    var title: String? = "",
-    var voteAverage: Double = 0.0
+    @SerializedName("id")
+    val id: Int,
+    @SerializedName("vote_average")
+    val voteAverage: Double,
+    @SerializedName("name")
+    val title: String
 ) {
-    val rating: Float
-        get() = voteAverage.div(2).toFloat()
+    @SerializedName("poster_path")
+    val posterPath: String? = null
+        get() = "https://image.tmdb.org/t/p/w500$field"
 }
