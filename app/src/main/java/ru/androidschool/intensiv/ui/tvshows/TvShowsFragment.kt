@@ -12,8 +12,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.androidschool.intensiv.R
+import ru.androidschool.intensiv.data.TvShow
 import ru.androidschool.intensiv.network.MovieApiClient
-import ru.androidschool.intensiv.network.responses.TvShowsResponse
+import ru.androidschool.intensiv.network.responses.MoviesResponse
 import timber.log.Timber
 
 private const val ARG_PARAM1 = "param1"
@@ -53,14 +54,14 @@ class TvShowsFragment : Fragment() {
         getTvShows.enqueue(provideResponseCallback())
     }
 
-    private fun provideResponseCallback() = object : Callback<TvShowsResponse> {
-        override fun onFailure(call: Call<TvShowsResponse>, t: Throwable) {
+    private fun provideResponseCallback() = object : Callback<MoviesResponse<TvShow>> {
+        override fun onFailure(call: Call<MoviesResponse<TvShow>>, t: Throwable) {
             Timber.e(t)
         }
 
         override fun onResponse(
-            call: Call<TvShowsResponse>,
-            response: Response<TvShowsResponse>
+            call: Call<MoviesResponse<TvShow>>,
+            response: Response<MoviesResponse<TvShow>>
         ) {
             response.body()?.results?.let { result ->
                 val tvShowsList = result.map {
