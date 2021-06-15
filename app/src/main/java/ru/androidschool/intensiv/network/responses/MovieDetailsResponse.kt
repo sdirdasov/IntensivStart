@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 import ru.androidschool.intensiv.BuildConfig
 import ru.androidschool.intensiv.data.Genre
 import ru.androidschool.intensiv.data.MovieStudio
+import ru.androidschool.intensiv.extensions.toFloatRating
 
 data class MovieDetailsResponse(
     @SerializedName("title")
@@ -22,4 +23,7 @@ data class MovieDetailsResponse(
     @SerializedName("poster_path")
     val posterPath: String? = null
         get() = "${BuildConfig.IMAGE_URL}$field"
+
+    val rating: Float
+        get() = voteAverage.toFloatRating()
 }

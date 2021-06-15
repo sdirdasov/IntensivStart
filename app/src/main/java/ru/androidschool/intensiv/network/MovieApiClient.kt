@@ -15,7 +15,7 @@ object MovieApiClient {
         .addInterceptor(HttpLoggingInterceptor(CustomHttpLogging()).apply {
             this.level = if (BuildConfig.DEBUG)
                 HttpLoggingInterceptor.Level.BODY
-            else 
+            else
                 HttpLoggingInterceptor.Level.NONE
         })
         .build()
