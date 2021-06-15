@@ -79,14 +79,14 @@ class FeedFragment : Fragment(R.layout.feed_fragment) {
     private fun provideResponseCallback(
         @StringRes
         titleContainer: Int
-    ) = object : Callback<MoviesResponse> {
-        override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
+    ) = object : Callback<MoviesResponse<Movie>> {
+        override fun onFailure(call: Call<MoviesResponse<Movie>>, t: Throwable) {
             Timber.e(t)
         }
 
         override fun onResponse(
-            call: Call<MoviesResponse>,
-            response: Response<MoviesResponse>
+            call: Call<MoviesResponse<Movie>>,
+            response: Response<MoviesResponse<Movie>>
         ) {
             response.body()?.results?.let { results ->
                 val moviesList = listOf(

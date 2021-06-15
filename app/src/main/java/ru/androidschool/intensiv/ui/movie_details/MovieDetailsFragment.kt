@@ -39,7 +39,7 @@ class MovieDetailsFragment : Fragment(R.layout.movie_details_fragment) {
             ) {
                 response.body()?.let { movie ->
                     movie_title.text = movie.title
-                    movie_rating.rating = movie.voteAverage.toFloat() / 2
+                    movie_rating.rating = movie.rating
                     movie_description.text = movie.description
                     movie_studio.text = movie.productionCompanies.joinToString(separator = ", ") { it.name }
                     movie_genre.text = movie.genres.joinToString(separator = ", ") { it.name }

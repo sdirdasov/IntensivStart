@@ -5,10 +5,11 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import ru.androidschool.intensiv.BuildConfig
+import ru.androidschool.intensiv.data.Movie
+import ru.androidschool.intensiv.data.TvShow
 import ru.androidschool.intensiv.network.responses.ActorsResponse
 import ru.androidschool.intensiv.network.responses.MovieDetailsResponse
 import ru.androidschool.intensiv.network.responses.MoviesResponse
-import ru.androidschool.intensiv.network.responses.TvShowsResponse
 
 interface MovieApiInterface {
 
@@ -16,25 +17,25 @@ interface MovieApiInterface {
     fun getNowPlayingMovies(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = DEFAULT_LANGUAGE
-    ): Call<MoviesResponse>
+    ): Call<MoviesResponse<Movie>>
 
     @GET("movie/upcoming")
     fun getUpcomingMovies(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = DEFAULT_LANGUAGE
-    ): Call<MoviesResponse>
+    ): Call<MoviesResponse<Movie>>
 
     @GET("movie/popular")
     fun getPopularMovies(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = DEFAULT_LANGUAGE
-    ): Call<MoviesResponse>
+    ): Call<MoviesResponse<Movie>>
 
     @GET("tv/popular")
     fun getTvShows(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = DEFAULT_LANGUAGE
-    ): Call<TvShowsResponse>
+    ): Call<MoviesResponse<TvShow>>
 
     @GET("movie/{movie_id}")
     fun getMovieDetailsById(
