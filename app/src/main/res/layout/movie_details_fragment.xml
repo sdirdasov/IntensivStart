@@ -91,7 +91,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/watch_movie_button"
                 app:layout_constraintStart_toStartOf="@id/content_start"
                 app:layout_constraintEnd_toEndOf="@id/content_end"
-                tools:text="@tools:sample/lorem/random"/>
+                tools:text=""/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/actors_recycler_view"
@@ -117,10 +117,11 @@
             <TextView
                 android:id="@+id/movie_studio"
                 style="@style/AppTheme.Text.Gray.Normal"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@+id/actors_recycler_view"
                 app:layout_constraintStart_toEndOf="@id/content2_start"
+                app:layout_constraintEnd_toStartOf="@+id/content_end"
                 tools:text="Warner Bros."/>
 
             <TextView
@@ -128,17 +129,20 @@
                 style="@style/AppTheme.Text.Light.Normal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/material_margin_small"
                 android:text="@string/genre_label_text"
-                app:layout_constraintTop_toBottomOf="@+id/studio_label"
+                app:layout_constraintTop_toBottomOf="@+id/movie_studio"
                 app:layout_constraintStart_toStartOf="@id/content_start"/>
 
             <TextView
                 android:id="@+id/movie_genre"
                 style="@style/AppTheme.Text.Gray.Normal"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/material_margin_small"
                 app:layout_constraintTop_toBottomOf="@+id/movie_studio"
                 app:layout_constraintStart_toEndOf="@id/content2_start"
+                app:layout_constraintEnd_toStartOf="@+id/content_end"
                 tools:text="Action, Adventure, Fantasy"/>
 
             <TextView
@@ -146,8 +150,9 @@
                 style="@style/AppTheme.Text.Light.Normal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/material_margin_small"
                 android:text="@string/year_label_text"
-                app:layout_constraintTop_toBottomOf="@+id/genre_label"
+                app:layout_constraintTop_toBottomOf="@+id/movie_genre"
                 app:layout_constraintStart_toStartOf="@id/content_start"/>
 
             <TextView
@@ -155,6 +160,7 @@
                 style="@style/AppTheme.Text.Gray.Normal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/material_margin_small"
                 app:layout_constraintTop_toBottomOf="@+id/movie_genre"
                 app:layout_constraintStart_toEndOf="@id/content2_start"
                 tools:text="2018"/>
