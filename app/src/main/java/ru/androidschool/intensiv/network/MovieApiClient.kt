@@ -13,7 +13,10 @@ object MovieApiClient {
 
     private var client: OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor(CustomHttpLogging()).apply {
-            this.level = HttpLoggingInterceptor.Level.BODY
+            this.level = if (BuildConfig.DEBUG)
+                HttpLoggingInterceptor.Level.BODY
+            else 
+                HttpLoggingInterceptor.Level.NONE
         })
         .build()
 

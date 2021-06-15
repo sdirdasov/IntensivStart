@@ -1,7 +1,6 @@
 package ru.androidschool.intensiv.network.responses
 
 import com.google.gson.annotations.SerializedName
-import ru.androidschool.intensiv.data.Movie
 
 data class MoviesResponse<T>(
     val page: Int,
