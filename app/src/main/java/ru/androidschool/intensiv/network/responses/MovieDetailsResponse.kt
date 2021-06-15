@@ -1,6 +1,7 @@
 package ru.androidschool.intensiv.network.responses
 
 import com.google.gson.annotations.SerializedName
+import ru.androidschool.intensiv.BuildConfig
 import ru.androidschool.intensiv.data.Genre
 import ru.androidschool.intensiv.data.MovieStudio
 
@@ -20,5 +21,5 @@ data class MovieDetailsResponse(
 ) {
     @SerializedName("poster_path")
     val posterPath: String? = null
-        get() = "https://image.tmdb.org/t/p/w500$field"
+        get() = "${BuildConfig.IMAGE_URL}$field"
 }
