@@ -16,7 +16,7 @@ data class MovieDetailsResponse(
     @SerializedName("release_date")
     val releaseDate: String,
     @SerializedName("genres")
-    val genres: List<Genre>,
+    val genresList: List<Genre>,
     @SerializedName("production_companies")
     val productionCompanies: List<MovieStudio>
 ) {
@@ -26,4 +26,10 @@ data class MovieDetailsResponse(
 
     val rating: Float
         get() = voteAverage.toFloatRating()
+
+    val studio: String
+        get() = productionCompanies.joinToString(separator = ", ") { it.name }
+
+    val genres: String
+        get() = genresList.joinToString(separator = ", ") { it.name }
 }

@@ -7,14 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.tv_shows_fragment.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import ru.androidschool.intensiv.R
-import ru.androidschool.intensiv.data.TvShow
 import ru.androidschool.intensiv.network.MovieApiClient
-import ru.androidschool.intensiv.network.responses.MoviesResponse
 import timber.log.Timber
 
 private const val ARG_PARAM1 = "param1"
@@ -50,26 +47,18 @@ class TvShowsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         tv_shows_recycler_view.adapter = adapter
-        val getTvShows = MovieApiClient.apiClient.getTvShows()
-        getTvShows.enqueue(provideResponseCallback())
-    }
 
-    private fun provideResponseCallback() = object : Callback<MoviesResponse<TvShow>> {
-        override fun onFailure(call: Call<MoviesResponse<TvShow>>, t: Throwable) {
-            Timber.e(t)
-        }
-
-        override fun onResponse(
-            call: Call<MoviesResponse<TvShow>>,
-            response: Response<MoviesResponse<TvShow>>
-        ) {
-            response.body()?.results?.let { result ->
-                val tvShowsList = result.map {
-                    TvShowItem(it)
-                }
-                adapter.apply { addAll(tvShowsList) }
+        MovieApiClient.apiClient.getTvShows()
+            .subscribeOn(Schedulers.io())
+            .map { response ->
+                response.results.map { TvShowItem(it) }
             }
-        }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ tvList ->
+                adapter.apply { addAll(tvList) }
+            }, { throwable ->
+                Timber.e(throwable)
+            })
     }
 
     companion object {

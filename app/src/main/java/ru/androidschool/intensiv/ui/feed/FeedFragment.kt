@@ -8,16 +8,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.feed_fragment.*
 import kotlinx.android.synthetic.main.feed_header.*
 import kotlinx.android.synthetic.main.search_toolbar.view.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import ru.androidschool.intensiv.R
 import ru.androidschool.intensiv.data.Movie
 import ru.androidschool.intensiv.network.MovieApiClient
-import ru.androidschool.intensiv.network.responses.MoviesResponse
 import ru.androidschool.intensiv.extensions.afterTextChanged
 import timber.log.Timber
 
@@ -48,20 +46,9 @@ class FeedFragment : Fragment(R.layout.feed_fragment) {
 
         movies_recycler_view.adapter = adapter
 
-        val getNowPlayingMovies = MovieApiClient.apiClient.getNowPlayingMovies()
-        getNowPlayingMovies.enqueue(
-            provideResponseCallback(R.string.recommended)
-        )
-
-        val getUpcomingMovies = MovieApiClient.apiClient.getUpcomingMovies()
-        getUpcomingMovies.enqueue(
-            provideResponseCallback(R.string.upcoming)
-        )
-
-        val getRecommendedMovies = MovieApiClient.apiClient.getPopularMovies()
-        getRecommendedMovies.enqueue(
-            provideResponseCallback(R.string.popular)
-        )
+        getRecommendedMovies()
+        getUpcomingMovies()
+        getPopularMovies()
     }
 
     private fun openMovieDetails(movie: Movie) {
@@ -76,33 +63,61 @@ class FeedFragment : Fragment(R.layout.feed_fragment) {
         findNavController().navigate(R.id.search_dest, bundle, options)
     }
 
-    private fun provideResponseCallback(
-        @StringRes
-        titleContainer: Int
-    ) = object : Callback<MoviesResponse<Movie>> {
-        override fun onFailure(call: Call<MoviesResponse<Movie>>, t: Throwable) {
-            Timber.e(t)
-        }
-
-        override fun onResponse(
-            call: Call<MoviesResponse<Movie>>,
-            response: Response<MoviesResponse<Movie>>
-        ) {
-            response.body()?.results?.let { results ->
-                val moviesList = listOf(
-                    MainCardContainer(
-                        titleContainer,
-                        results.map {
-                            MovieItem(it) { movie ->
-                                openMovieDetails(movie)
-                            }
-                        }
-                    )
-                )
-                adapter.apply { addAll(moviesList) }
+    private fun getRecommendedMovies() {
+        MovieApiClient.apiClient.getNowPlayingMovies()
+            .subscribeOn(Schedulers.io())
+            .map { response ->
+                mapToCardContainer(R.string.recommended, response.results)
             }
-        }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ moviesList ->
+                adapter.apply { addAll(moviesList) }
+            }, { throwable ->
+                Timber.e(throwable)
+            })
     }
+
+    private fun getUpcomingMovies() {
+        MovieApiClient.apiClient.getUpcomingMovies()
+            .subscribeOn(Schedulers.io())
+            .map { response ->
+                mapToCardContainer(R.string.upcoming, response.results)
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ moviesList ->
+                adapter.apply { addAll(moviesList) }
+            }, { throwable ->
+                Timber.e(throwable)
+            })
+    }
+
+    private fun getPopularMovies() {
+        MovieApiClient.apiClient.getPopularMovies()
+            .subscribeOn(Schedulers.io())
+            .map { response ->
+                mapToCardContainer(R.string.popular, response.results)
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ moviesList ->
+                adapter.apply { addAll(moviesList) }
+            }, { throwable ->
+                Timber.e(throwable)
+            })
+    }
+
+    private fun mapToCardContainer(
+        @StringRes titleContainer: Int,
+        movies: List<Movie>
+    ): List<MainCardContainer> = listOf(
+        MainCardContainer(
+            titleContainer,
+            movies.map {
+                MovieItem(it) { movie ->
+                    openMovieDetails(movie)
+                }
+            }
+        )
+    )
 
     override fun onStop() {
         super.onStop()
