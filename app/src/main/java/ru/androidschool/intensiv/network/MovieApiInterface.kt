@@ -51,6 +51,13 @@ interface MovieApiInterface {
         @Query("language") language: String = DEFAULT_LANGUAGE
     ): Single<ActorsResponse>
 
+    @GET("search/movie")
+    fun searchMovie(
+        @Query("api_key") apiKey: String = API_KEY,
+        @Query("language") language: String = DEFAULT_LANGUAGE,
+        @Query("query") query: String
+    ): Single<MoviesResponse<Movie>>
+
     companion object {
         private const val API_KEY = BuildConfig.THE_MOVIE_DATABASE_API
         private const val DEFAULT_LANGUAGE = "ru-RU"
