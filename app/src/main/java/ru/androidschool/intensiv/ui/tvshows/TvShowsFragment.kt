@@ -7,11 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.tv_shows_fragment.*
 import ru.androidschool.intensiv.R
 import ru.androidschool.intensiv.network.MovieApiClient
+import ru.androidschool.intensiv.util.applyObservableAsync
 import timber.log.Timber
 
 private const val ARG_PARAM1 = "param1"
@@ -49,11 +48,12 @@ class TvShowsFragment : Fragment() {
         tv_shows_recycler_view.adapter = adapter
 
         MovieApiClient.apiClient.getTvShows()
-            .subscribeOn(Schedulers.io())
+            .compose(applyObservableAsync())
+            .doOnSubscribe { progress_bar.visibility = View.VISIBLE }
+            .doFinally { progress_bar.visibility = View.GONE }
             .map { response ->
                 response.results.map { TvShowItem(it) }
             }
-            .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ tvList ->
                 adapter.apply { addAll(tvList) }
             }, { throwable ->

@@ -5,8 +5,6 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.movie_details_fragment.*
 import kotlinx.android.synthetic.main.movie_details_fragment.movie_rating
 import kotlinx.android.synthetic.main.movie_details_header.*
@@ -15,6 +13,7 @@ import ru.androidschool.intensiv.network.MovieApiClient
 import ru.androidschool.intensiv.ui.feed.FeedFragment
 import ru.androidschool.intensiv.extensions.formatDate
 import ru.androidschool.intensiv.extensions.load
+import ru.androidschool.intensiv.util.applyObservableAsync
 import timber.log.Timber
 
 class MovieDetailsFragment : Fragment(R.layout.movie_details_fragment) {
@@ -42,8 +41,7 @@ class MovieDetailsFragment : Fragment(R.layout.movie_details_fragment) {
     private fun getMovieById() {
         idMovie?.let { id ->
             MovieApiClient.apiClient.getMovieDetailsById(movieId = id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(applyObservableAsync())
                 .subscribe({ response ->
                     movie_title.text = response.title
                     movie_rating.rating = response.rating
@@ -61,11 +59,10 @@ class MovieDetailsFragment : Fragment(R.layout.movie_details_fragment) {
     private fun getMovieActors() {
         idMovie?.let { id ->
             MovieApiClient.apiClient.getActorsMovieById(movieId = id)
-                .subscribeOn(Schedulers.io())
+                .compose(applyObservableAsync())
                 .map { response ->
                     response.cast.map { ActorItem(it) }
                 }
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ actorList ->
                     actors_recycler_view.adapter = adapter.apply { addAll(actorList) }
                 }, { throwable ->

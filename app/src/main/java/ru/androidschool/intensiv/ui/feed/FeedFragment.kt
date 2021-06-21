@@ -8,9 +8,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.feed_fragment.*
 import kotlinx.android.synthetic.main.feed_header.*
 import kotlinx.android.synthetic.main.search_toolbar.view.*
@@ -18,8 +16,8 @@ import ru.androidschool.intensiv.R
 import ru.androidschool.intensiv.data.Movie
 import ru.androidschool.intensiv.network.MovieApiClient
 import ru.androidschool.intensiv.extensions.afterTextChanged
-import timber.log.Timber
-import java.util.concurrent.TimeUnit
+import ru.androidschool.intensiv.util.applyObservableAsync
+import ru.androidschool.intensiv.util.applyObservableEditText
 
 class FeedFragment : Fragment(R.layout.feed_fragment) {
 
@@ -39,24 +37,10 @@ class FeedFragment : Fragment(R.layout.feed_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Observable.create<String> { emitter ->
-            search_toolbar.search_edit_text.afterTextChanged {
-                emitter.onNext("$it".trim())
-            }
-        }
-            .debounce(500, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
-            .filter {
-                it.length > MIN_LENGTH
-            }
-            .subscribe{
-                openSearch(it)
-            }
-
         movies_recycler_view.adapter = adapter
 
-        getRecommendedMovies()
-        getUpcomingMovies()
-        getPopularMovies()
+        initSearchObservable()
+        getMovies()
     }
 
     private fun openMovieDetails(movie: Movie) {
@@ -71,46 +55,47 @@ class FeedFragment : Fragment(R.layout.feed_fragment) {
         findNavController().navigate(R.id.search_dest, bundle, options)
     }
 
-    private fun getRecommendedMovies() {
-        MovieApiClient.apiClient.getNowPlayingMovies()
-            .subscribeOn(Schedulers.io())
-            .map { response ->
-                mapToCardContainer(R.string.recommended, response.results)
+    private fun initSearchObservable() {
+        Observable.create<String> { emitter ->
+            search_toolbar.search_edit_text.afterTextChanged {
+                emitter.onNext("$it".trim())
             }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ moviesList ->
-                adapter.apply { addAll(moviesList) }
-            }, { throwable ->
-                Timber.e(throwable)
-            })
+        }
+            .compose(applyObservableEditText(500))
+            .filter {
+                it.length > MIN_LENGTH
+            }
+            .subscribe {
+                openSearch(it)
+            }
     }
 
-    private fun getUpcomingMovies() {
-        MovieApiClient.apiClient.getUpcomingMovies()
-            .subscribeOn(Schedulers.io())
-            .map { response ->
-                mapToCardContainer(R.string.upcoming, response.results)
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ moviesList ->
-                adapter.apply { addAll(moviesList) }
-            }, { throwable ->
-                Timber.e(throwable)
-            })
-    }
+    private fun getMovies() {
+        val recommended = MovieApiClient.apiClient.getNowPlayingMovies()
+        val upcoming = MovieApiClient.apiClient.getUpcomingMovies()
+        val popular = MovieApiClient.apiClient.getPopularMovies()
 
-    private fun getPopularMovies() {
-        MovieApiClient.apiClient.getPopularMovies()
-            .subscribeOn(Schedulers.io())
-            .map { response ->
-                mapToCardContainer(R.string.popular, response.results)
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ moviesList ->
-                adapter.apply { addAll(moviesList) }
-            }, { throwable ->
-                Timber.e(throwable)
+        Observable.zip(recommended, upcoming, popular,
+            { response1, response2, response3 ->
+                listOf(
+                    FeedItem(R.string.recommended, response1.results),
+                    FeedItem(R.string.upcoming, response2.results),
+                    FeedItem(R.string.popular, response3.results)
+                )
             })
+            .compose(applyObservableAsync())
+            .doOnSubscribe { progress_bar.visibility = View.VISIBLE }
+            .doFinally { progress_bar.visibility = View.GONE }
+            .map {
+                it.map { feed ->
+                    mapToCardContainer(feed.title, feed.items)
+                }
+            }
+            .subscribe {
+                it.map { movieList ->
+                    adapter.apply { addAll(movieList) }
+                }
+            }
     }
 
     private fun mapToCardContainer(
