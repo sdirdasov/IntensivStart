@@ -4,7 +4,9 @@ import com.google.gson.annotations.SerializedName
 import ru.androidschool.intensiv.BuildConfig
 import ru.androidschool.intensiv.data.Genre
 import ru.androidschool.intensiv.data.MovieStudio
+import ru.androidschool.intensiv.extensions.formatDate
 import ru.androidschool.intensiv.extensions.toFloatRating
+import ru.androidschool.intensiv.util.YEAR_PATTERN
 
 data class MovieDetailsResponse(
     @SerializedName("title")
@@ -26,6 +28,11 @@ data class MovieDetailsResponse(
 
     val rating: Float
         get() = voteAverage.toFloatRating()
+
+    val date: String
+        get() = if (releaseDate.isNotEmpty()) {
+            releaseDate.formatDate(YEAR_PATTERN)
+        } else { "" }
 
     val studio: String
         get() = productionCompanies.joinToString(separator = ", ") { it.name }

@@ -11,7 +11,6 @@ import kotlinx.android.synthetic.main.movie_details_header.*
 import ru.androidschool.intensiv.R
 import ru.androidschool.intensiv.network.MovieApiClient
 import ru.androidschool.intensiv.ui.feed.FeedFragment
-import ru.androidschool.intensiv.extensions.formatDate
 import ru.androidschool.intensiv.extensions.load
 import ru.androidschool.intensiv.util.applyObservableAsync
 import timber.log.Timber
@@ -48,7 +47,7 @@ class MovieDetailsFragment : Fragment(R.layout.movie_details_fragment) {
                     movie_description.text = response.description
                     movie_studio.text = response.studio
                     movie_genre.text = response.genres
-                    movie_year.text = response.releaseDate.formatDate("yyyy")
+                    movie_year.text = response.date
                     movie_image.load(response.posterPath)
                 }, { throwable ->
                     Timber.e(throwable)

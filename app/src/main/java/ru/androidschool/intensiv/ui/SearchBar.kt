@@ -7,9 +7,11 @@ import android.view.View
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
+import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.search_toolbar.view.*
 import ru.androidschool.intensiv.R
 import ru.androidschool.intensiv.extensions.afterTextChanged
+import ru.androidschool.intensiv.util.applyObservableEditText
 
 class SearchBar @JvmOverloads constructor(
     context: Context,
@@ -41,6 +43,19 @@ class SearchBar @JvmOverloads constructor(
         this.editText.setText("")
     }
 
+    fun searchEditTextObservable(): Observable<String> {
+        val observable: Observable<String> = Observable.create { emitter ->
+            search_edit_text.afterTextChanged { text ->
+                emitter.onNext("$text".trim())
+            }
+        }
+        return observable
+            .compose(applyObservableEditText(TIMEOUT_INPUT))
+            .filter {
+                it.length > MIN_LENGTH
+            }
+    }
+
     override fun onFinishInflate() {
         super.onFinishInflate()
         search_edit_text.hint = hint
@@ -59,5 +74,10 @@ class SearchBar @JvmOverloads constructor(
                 delete_text_button.visibility = View.GONE
             }
         }
+    }
+
+    companion object {
+        const val MIN_LENGTH = 3
+        const val TIMEOUT_INPUT = 500L
     }
 }

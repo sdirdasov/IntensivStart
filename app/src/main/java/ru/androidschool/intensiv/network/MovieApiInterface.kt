@@ -1,6 +1,6 @@
 package ru.androidschool.intensiv.network
 
-import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -17,46 +17,46 @@ interface MovieApiInterface {
     fun getNowPlayingMovies(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = DEFAULT_LANGUAGE
-    ): Observable<MoviesResponse<Movie>>
+    ): Single<MoviesResponse<Movie>>
 
     @GET("movie/upcoming")
     fun getUpcomingMovies(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = DEFAULT_LANGUAGE
-    ): Observable<MoviesResponse<Movie>>
+    ): Single<MoviesResponse<Movie>>
 
     @GET("movie/popular")
     fun getPopularMovies(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = DEFAULT_LANGUAGE
-    ): Observable<MoviesResponse<Movie>>
+    ): Single<MoviesResponse<Movie>>
 
     @GET("tv/popular")
     fun getTvShows(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = DEFAULT_LANGUAGE
-    ): Observable<MoviesResponse<TvShow>>
+    ): Single<MoviesResponse<TvShow>>
 
     @GET("movie/{movie_id}")
     fun getMovieDetailsById(
         @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = DEFAULT_LANGUAGE
-    ): Observable<MovieDetailsResponse>
+    ): Single<MovieDetailsResponse>
 
     @GET("movie/{movie_id}/credits")
     fun getActorsMovieById(
         @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = DEFAULT_LANGUAGE
-    ): Observable<ActorsResponse>
+    ): Single<ActorsResponse>
 
     @GET("search/movie")
     fun searchMovie(
         @Query("api_key") apiKey: String = API_KEY,
         @Query("language") language: String = DEFAULT_LANGUAGE,
         @Query("query") query: String
-    ): Observable<MoviesResponse<Movie>>
+    ): Single<MoviesResponse<Movie>>
 
     companion object {
         private const val API_KEY = BuildConfig.THE_MOVIE_DATABASE_API

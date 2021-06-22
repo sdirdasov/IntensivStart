@@ -7,21 +7,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
-import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.feed_header.*
 import kotlinx.android.synthetic.main.fragment_search.movies_recycler_view
 import kotlinx.android.synthetic.main.fragment_search.progress_bar
-import kotlinx.android.synthetic.main.search_toolbar.view.*
 import ru.androidschool.intensiv.R
 import ru.androidschool.intensiv.data.Movie
-import ru.androidschool.intensiv.extensions.afterTextChanged
 import ru.androidschool.intensiv.network.MovieApiClient
 import ru.androidschool.intensiv.ui.feed.FeedFragment
 import ru.androidschool.intensiv.ui.feed.FeedFragment.Companion.KEY_SEARCH
-import ru.androidschool.intensiv.ui.feed.FeedFragment.Companion.MIN_LENGTH
 import ru.androidschool.intensiv.ui.feed.MovieItem
 import ru.androidschool.intensiv.util.applyObservableAsync
-import ru.androidschool.intensiv.util.applyObservableEditText
 import timber.log.Timber
 
 class SearchFragment : Fragment(R.layout.fragment_search) {
@@ -53,15 +48,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     }
 
     private fun initSearchObservable() {
-        Observable.create<String> { emitter ->
-            search_toolbar.search_edit_text.afterTextChanged {
-                emitter.onNext("$it".trim())
-            }
-        }
-            .compose(applyObservableEditText(500))
-            .filter {
-                it.length > MIN_LENGTH
-            }
+        search_toolbar.searchEditTextObservable()
             .subscribe {
                 adapter.clear()
                 searchMovie(it)

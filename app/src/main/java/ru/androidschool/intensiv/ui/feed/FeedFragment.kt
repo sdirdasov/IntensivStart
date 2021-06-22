@@ -8,16 +8,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
-import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import kotlinx.android.synthetic.main.feed_fragment.*
 import kotlinx.android.synthetic.main.feed_header.*
-import kotlinx.android.synthetic.main.search_toolbar.view.*
 import ru.androidschool.intensiv.R
 import ru.androidschool.intensiv.data.Movie
 import ru.androidschool.intensiv.network.MovieApiClient
-import ru.androidschool.intensiv.extensions.afterTextChanged
 import ru.androidschool.intensiv.util.applyObservableAsync
-import ru.androidschool.intensiv.util.applyObservableEditText
+import timber.log.Timber
 
 class FeedFragment : Fragment(R.layout.feed_fragment) {
 
@@ -56,15 +54,7 @@ class FeedFragment : Fragment(R.layout.feed_fragment) {
     }
 
     private fun initSearchObservable() {
-        Observable.create<String> { emitter ->
-            search_toolbar.search_edit_text.afterTextChanged {
-                emitter.onNext("$it".trim())
-            }
-        }
-            .compose(applyObservableEditText(500))
-            .filter {
-                it.length > MIN_LENGTH
-            }
+        search_toolbar.searchEditTextObservable()
             .subscribe {
                 openSearch(it)
             }
@@ -75,7 +65,7 @@ class FeedFragment : Fragment(R.layout.feed_fragment) {
         val upcoming = MovieApiClient.apiClient.getUpcomingMovies()
         val popular = MovieApiClient.apiClient.getPopularMovies()
 
-        Observable.zip(recommended, upcoming, popular,
+        Single.zip(recommended, upcoming, popular,
             { response1, response2, response3 ->
                 listOf(
                     FeedItem(R.string.recommended, response1.results),
@@ -91,11 +81,11 @@ class FeedFragment : Fragment(R.layout.feed_fragment) {
                     mapToCardContainer(feed.title, feed.items)
                 }
             }
-            .subscribe {
+            .subscribe({
                 it.map { movieList ->
                     adapter.apply { addAll(movieList) }
                 }
-            }
+            }, { throwable -> Timber.e(throwable) })
     }
 
     private fun mapToCardContainer(
@@ -123,7 +113,6 @@ class FeedFragment : Fragment(R.layout.feed_fragment) {
     }
 
     companion object {
-        const val MIN_LENGTH = 3
         const val KEY_SEARCH = "search"
         const val KEY_MOVIE_ID = "id"
     }
