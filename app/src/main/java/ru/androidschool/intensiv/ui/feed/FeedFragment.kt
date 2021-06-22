@@ -8,17 +8,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
+import io.reactivex.rxjava3.core.Single
 import kotlinx.android.synthetic.main.feed_fragment.*
 import kotlinx.android.synthetic.main.feed_header.*
-import kotlinx.android.synthetic.main.search_toolbar.view.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import ru.androidschool.intensiv.R
 import ru.androidschool.intensiv.data.Movie
 import ru.androidschool.intensiv.network.MovieApiClient
-import ru.androidschool.intensiv.network.responses.MoviesResponse
-import ru.androidschool.intensiv.extensions.afterTextChanged
+import ru.androidschool.intensiv.util.applyObservableAsync
 import timber.log.Timber
 
 class FeedFragment : Fragment(R.layout.feed_fragment) {
@@ -39,29 +35,10 @@ class FeedFragment : Fragment(R.layout.feed_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        search_toolbar.search_edit_text.afterTextChanged {
-            Timber.d(it.toString())
-            if (it.toString().length > MIN_LENGTH) {
-                openSearch(it.toString())
-            }
-        }
-
         movies_recycler_view.adapter = adapter
 
-        val getNowPlayingMovies = MovieApiClient.apiClient.getNowPlayingMovies()
-        getNowPlayingMovies.enqueue(
-            provideResponseCallback(R.string.recommended)
-        )
-
-        val getUpcomingMovies = MovieApiClient.apiClient.getUpcomingMovies()
-        getUpcomingMovies.enqueue(
-            provideResponseCallback(R.string.upcoming)
-        )
-
-        val getRecommendedMovies = MovieApiClient.apiClient.getPopularMovies()
-        getRecommendedMovies.enqueue(
-            provideResponseCallback(R.string.popular)
-        )
+        initSearchObservable()
+        getMovies()
     }
 
     private fun openMovieDetails(movie: Movie) {
@@ -76,33 +53,54 @@ class FeedFragment : Fragment(R.layout.feed_fragment) {
         findNavController().navigate(R.id.search_dest, bundle, options)
     }
 
-    private fun provideResponseCallback(
-        @StringRes
-        titleContainer: Int
-    ) = object : Callback<MoviesResponse<Movie>> {
-        override fun onFailure(call: Call<MoviesResponse<Movie>>, t: Throwable) {
-            Timber.e(t)
-        }
-
-        override fun onResponse(
-            call: Call<MoviesResponse<Movie>>,
-            response: Response<MoviesResponse<Movie>>
-        ) {
-            response.body()?.results?.let { results ->
-                val moviesList = listOf(
-                    MainCardContainer(
-                        titleContainer,
-                        results.map {
-                            MovieItem(it) { movie ->
-                                openMovieDetails(movie)
-                            }
-                        }
-                    )
-                )
-                adapter.apply { addAll(moviesList) }
+    private fun initSearchObservable() {
+        search_toolbar.searchEditTextObservable()
+            .subscribe {
+                openSearch(it)
             }
-        }
     }
+
+    private fun getMovies() {
+        val recommended = MovieApiClient.apiClient.getNowPlayingMovies()
+        val upcoming = MovieApiClient.apiClient.getUpcomingMovies()
+        val popular = MovieApiClient.apiClient.getPopularMovies()
+
+        Single.zip(recommended, upcoming, popular,
+            { response1, response2, response3 ->
+                listOf(
+                    FeedItem(R.string.recommended, response1.results),
+                    FeedItem(R.string.upcoming, response2.results),
+                    FeedItem(R.string.popular, response3.results)
+                )
+            })
+            .compose(applyObservableAsync())
+            .doOnSubscribe { progress_bar.visibility = View.VISIBLE }
+            .doFinally { progress_bar.visibility = View.GONE }
+            .map {
+                it.map { feed ->
+                    mapToCardContainer(feed.title, feed.items)
+                }
+            }
+            .subscribe({
+                it.map { movieList ->
+                    adapter.apply { addAll(movieList) }
+                }
+            }, { throwable -> Timber.e(throwable) })
+    }
+
+    private fun mapToCardContainer(
+        @StringRes titleContainer: Int,
+        movies: List<Movie>
+    ): List<MainCardContainer> = listOf(
+        MainCardContainer(
+            titleContainer,
+            movies.map {
+                MovieItem(it) { movie ->
+                    openMovieDetails(movie)
+                }
+            }
+        )
+    )
 
     override fun onStop() {
         super.onStop()
@@ -115,7 +113,6 @@ class FeedFragment : Fragment(R.layout.feed_fragment) {
     }
 
     companion object {
-        const val MIN_LENGTH = 3
         const val KEY_SEARCH = "search"
         const val KEY_MOVIE_ID = "id"
     }

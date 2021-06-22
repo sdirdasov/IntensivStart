@@ -49,4 +49,7 @@ ext {
 
     retrofitVersion = '2.9.0'
     okHttpVersion = '4.8.1'
+
+    rxjavaVersion = '3.0.0'
+    rxAdapterVersion = '2.9.0'
 }
