@@ -44,13 +44,12 @@
                 app:layout_constraintStart_toStartOf="@id/content_start"
                 tools:text="Aquaman"/>
 
-            <ImageButton
+            <CheckBox
                 android:id="@+id/movie_favor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_favorite_border"
+                android:button="@drawable/checkbox_favorite"
                 android:background="@color/blueDark"
-                app:tint="@color/textColorGrey"
                 app:layout_constraintTop_toTopOf="@id/movie_title"
                 app:layout_constraintBottom_toBottomOf="@id/movie_title"
                 app:layout_constraintEnd_toEndOf="@id/content_end"
