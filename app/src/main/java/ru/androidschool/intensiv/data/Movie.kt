@@ -13,7 +13,7 @@ data class Movie(
     val voteAverage: Double
 ) {
     @SerializedName("poster_path")
-    val posterPath: String? = null
+    var posterPath: String? = null
         get() = "${BuildConfig.IMAGE_URL}$field"
 
     val rating: Float
