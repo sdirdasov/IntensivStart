@@ -30,6 +30,10 @@ class MovieDetailsFragment : Fragment(R.layout.movie_details_fragment) {
         arguments?.getInt(FeedFragment.KEY_MOVIE_ID)
     }
 
+    private val moviesDb by lazy {
+        MoviesDatabase.get(requireContext()).movieDao()
+    }
+
     private var movie: MovieEntity? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,15 +53,13 @@ class MovieDetailsFragment : Fragment(R.layout.movie_details_fragment) {
 
     private fun setFavorCheckbox() {
         idMovie?.let { id ->
-            MoviesDatabase.get(requireContext())?.movieDao()?.let { dbMovies ->
-                dbMovies.getMovieById(id)
-                    .compose(applyObservableAsync())
-                    .subscribe({
-                        movie_favor.isChecked = true
-                    }, { throwable ->
-                        Timber.e(throwable)
-                    })
-            }
+            moviesDb.getMovieById(id)
+                .compose(applyObservableAsync())
+                .subscribe({
+                    movie_favor.isChecked = true
+                }, { throwable ->
+                    Timber.e(throwable)
+                })
         }
     }
 
@@ -110,27 +112,27 @@ class MovieDetailsFragment : Fragment(R.layout.movie_details_fragment) {
 
     private fun saveMovie() {
         movie?.let {
-            MoviesDatabase.get(requireContext())?.movieDao()?.let { dbMovies ->
-                dbMovies.save(it)
-                    .compose(applyCompletableAsync())
-                    .subscribe({ }, { throwable ->
-                        movie_favor.isChecked = false
-                        Timber.e(throwable)
-                    })
-            }
+            moviesDb.save(it)
+                .compose(applyCompletableAsync())
+                .subscribe({
+                    Timber.d("DB save favorite movie is success")
+                }, { throwable ->
+                    movie_favor.isChecked = false
+                    Timber.e(throwable)
+                })
         }
     }
 
     private fun deleteMovie() {
         movie?.let {
-            MoviesDatabase.get(requireContext())?.movieDao()?.let { dbMovies ->
-                dbMovies.delete(it)
-                    .compose(applyCompletableAsync())
-                    .subscribe({ }, { throwable ->
-                        movie_favor.isChecked = true
-                        Timber.e(throwable)
-                    })
-            }
+            moviesDb.delete(it)
+                .compose(applyCompletableAsync())
+                .subscribe({
+                    Timber.d("DB delete favorite movie is success")
+                }, { throwable ->
+                    movie_favor.isChecked = true
+                    Timber.e(throwable)
+                })
         }
     }
 

@@ -12,16 +12,13 @@ abstract class MoviesDatabase : RoomDatabase() {
     companion object {
         private var instance: MoviesDatabase? = null
 
-        fun get(context: Context): MoviesDatabase? {
-            if (instance == null) {
-                instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    MoviesDatabase::class.java,
-                    "movies_db"
-                ).fallbackToDestructiveMigration()
-                    .build()
-            }
-            return instance
+        fun get(context: Context): MoviesDatabase = instance ?: run {
+            Room.databaseBuilder(
+                context.applicationContext,
+                MoviesDatabase::class.java,
+                "movies_db"
+            ).fallbackToDestructiveMigration()
+                .build()
         }
     }
 
