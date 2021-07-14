@@ -8,7 +8,10 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
 import kotlinx.android.synthetic.main.fragment_watchlist.*
 import ru.androidschool.intensiv.R
-import ru.androidschool.intensiv.data.MockRepository
+import ru.androidschool.intensiv.data.Movie
+import ru.androidschool.intensiv.database.MoviesDatabase
+import ru.androidschool.intensiv.util.applyObservableAsync
+import timber.log.Timber
 
 class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
 
@@ -16,20 +19,34 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
         GroupAdapter<GroupieViewHolder>()
     }
 
+    private val moviesDb by lazy {
+        MoviesDatabase.get(requireContext()).movieDao()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         movies_recycler_view.layoutManager = GridLayoutManager(context, 4)
-        movies_recycler_view.adapter = adapter.apply { addAll(listOf()) }
 
-        val moviesList =
-            MockRepository.getMovies().map {
-                MoviePreviewItem(
-                    it
-                ) { movie -> }
-            }.toList()
-
-        movies_recycler_view.adapter = adapter.apply { addAll(moviesList) }
+        moviesDb.getMovies()
+            .compose(applyObservableAsync())
+            .map { dtoMovies ->
+                dtoMovies.map {
+                    Movie(
+                        id = it.id,
+                        title = it.title,
+                        voteAverage = it.rating.toDouble()
+                    ).apply { posterPath = it.posterPath }
+                }
+            }
+            .subscribe({ moviesList ->
+                val list = moviesList.map {
+                    MoviePreviewItem(it) { }
+                }
+                movies_recycler_view.adapter = adapter.apply { addAll(list) }
+            }, { throwable ->
+                Timber.e(throwable)
+            })
     }
 
     companion object {
